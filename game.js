@@ -1,6 +1,8 @@
 const canvas = document.getElementById('gameCanvas');
 const context = canvas.getContext('2d');
 const boxSize = 20;
+const gridWidth = canvas.width / boxSize;
+const gridHeight = canvas.height / boxSize;
 let snake = [];
 let direction;
 let food = { x: 0, y: 0 };
@@ -24,8 +26,10 @@ function startGame() {
 }
 
 function generateFood() {
-  food.x = Math.floor(Math.random() * (canvas.width / boxSize));
-  food.y = Math.floor(Math.random() * (canvas.height / boxSize));
+  do {
+    food.x = Math.floor(Math.random() * gridWidth);
+    food.y = Math.floor(Math.random() * gridHeight);
+  } while (snake.some(segment => segment.x === food.x && segment.y === food.y));
 }
 
 function draw() {
@@ -76,9 +80,9 @@ function update() {
 function checkCollision(head) {
   return (
     head.x < 0 ||
-    head.x >= canvas.width / boxSize ||
+    head.x >= gridWidth ||
     head.y < 0 ||
-    head.y >= canvas.height / boxSize ||
+    head.y >= gridHeight ||
     snake.some(segment => segment.x === head.x && segment.y === head.y)
   );
 }
@@ -98,4 +102,5 @@ stopButton.addEventListener('click', function () {
   clearInterval(gameInterval);
   location.reload();
 });
+
 
