@@ -3,17 +3,16 @@ const context = canvas.getContext('2d');
 const boxSize = 20;
 const gridWidth = canvas.width / boxSize;
 const gridHeight = canvas.height / boxSize;
-let snake = [];
-let direction;
+let snake = [{ x: 10, y: 10 }];
+let direction = 'right';
 let food = { x: 0, y: 0 };
 let score = 0;
 let gameInterval;
 
-canvas.addEventListener('keydown', handleKeyDown);
+document.addEventListener('keydown', handleKeyDown);
 
 function startGame() {
-  snake = [];
-  snake[0] = { x: 10, y: 10 };
+  snake = [{ x: 10, y: 10 }];
   direction = 'right';
   score = 0;
   generateFood();
@@ -21,7 +20,7 @@ function startGame() {
   if (gameInterval) {
     clearInterval(gameInterval);
   }
-  
+
   gameInterval = setInterval(update, 200);
 }
 
@@ -35,12 +34,12 @@ function generateFood() {
 function draw() {
   context.clearRect(0, 0, canvas.width, canvas.height);
 
-  for (let i = 0; i < snake.length; i++) {
-    context.fillStyle = i === 0 ? 'pink' : 'white';
-    context.fillRect(snake[i].x * boxSize, snake[i].y * boxSize, boxSize, boxSize);
+  snake.forEach(segment => {
+    context.fillStyle = 'white';
+    context.fillRect(segment.x * boxSize, segment.y * boxSize, boxSize, boxSize);
     context.strokeStyle = 'black';
-    context.strokeRect(snake[i].x * boxSize, snake[i].y * boxSize, boxSize, boxSize);
-  }
+    context.strokeRect(segment.x * boxSize, segment.y * boxSize, boxSize, boxSize);
+  });
 
   context.fillStyle = 'red';
   context.fillRect(food.x * boxSize, food.y * boxSize, boxSize, boxSize);
