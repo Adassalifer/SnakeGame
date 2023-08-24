@@ -5,8 +5,9 @@ let snake = [];
 let direction;
 let food = { x: 0, y: 0 };
 let score = 0;
+let gameInterval;
 
-canvas.addEventListener('mousemove', handleMouseMove);
+canvas.addEventListener('keydown', handleKeyDown);
 
 function startGame() {
   snake = [];
@@ -15,7 +16,11 @@ function startGame() {
   score = 0;
   generateFood();
 
-  setInterval(update, 200);
+  if (gameInterval) {
+    clearInterval(gameInterval);
+  }
+  
+  gameInterval = setInterval(update, 200);
 }
 
 function generateFood() {
@@ -51,9 +56,16 @@ function update() {
 
   if (head.x === food.x && head.y === food.y) {
     score++;
+    snake.push({});
     generateFood();
   } else {
     snake.pop();
+  }
+
+  if (checkCollision(head)) {
+    clearInterval(gameInterval);
+    alert('Game Over');
+    return;
   }
 
   snake.unshift(head);
@@ -61,20 +73,21 @@ function update() {
   draw();
 }
 
-function handleMouseMove(event) {
-  const canvasRect = canvas.getBoundingClientRect();
-  const mouseX = event.clientX - canvasRect.left;
-  const mouseY = event.clientY - canvasRect.top;
+function checkCollision(head) {
+  return (
+    head.x < 0 ||
+    head.x >= canvas.width / boxSize ||
+    head.y < 0 ||
+    head.y >= canvas.height / boxSize ||
+    snake.some(segment => segment.x === head.x && segment.y === head.y)
+  );
+}
 
-  const snakeHead = snake[0];
-  const dx = mouseX - snakeHead.x * boxSize;
-  const dy = mouseY - snakeHead.y * boxSize;
-
-  if (Math.abs(dx) > Math.abs(dy)) {
-    direction = dx > 0 ? 'right' : 'left';
-  } else {
-    direction = dy > 0 ? 'down' : 'up';
-  }
+function handleKeyDown(event) {
+  if (event.key === 'ArrowRight' && direction !== 'left') direction = 'right';
+  if (event.key === 'ArrowLeft' && direction !== 'right') direction = 'left';
+  if (event.key === 'ArrowUp' && direction !== 'down') direction = 'up';
+  if (event.key === 'ArrowDown' && direction !== 'up') direction = 'down';
 }
 
 const startButton = document.getElementById('startButton');
@@ -82,5 +95,7 @@ const stopButton = document.getElementById('stopButton');
 
 startButton.addEventListener('click', startGame);
 stopButton.addEventListener('click', function () {
+  clearInterval(gameInterval);
   location.reload();
 });
+
