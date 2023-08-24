@@ -8,8 +8,16 @@ let direction = 'right';
 let food = { x: 0, y: 0 };
 let score = 0;
 let gameInterval;
+let touchStartX = 0;
+let touchStartY = 0;
 
 document.addEventListener('keydown', handleKeyDown);
+canvas.addEventListener('mousedown', handleMouseDown);
+canvas.addEventListener('mouseup', handleMouseUp);
+canvas.addEventListener('mousemove', handleMouseMove);
+canvas.addEventListener('touchstart', handleTouchStart);
+canvas.addEventListener('touchend', handleTouchEnd);
+canvas.addEventListener('touchmove', handleTouchMove);
 
 function startGame() {
   snake = [{ x: 10, y: 10 }];
@@ -93,6 +101,47 @@ function handleKeyDown(event) {
   if (event.key === 'ArrowDown' && direction !== 'up') direction = 'down';
 }
 
+function handleMouseDown(event) {
+  touchStartX = event.clientX;
+  touchStartY = event.clientY;
+}
+
+function handleMouseUp(event) {
+  const touchEndX = event.clientX;
+  const touchEndY = event.clientY;
+  handleTouchMove(touchEndX, touchEndY);
+}
+
+function handleMouseMove(event) {
+  if (event.buttons === 1) {
+    const touchEndX = event.clientX;
+    const touchEndY = event.clientY;
+    handleTouchMove(touchEndX, touchEndY);
+  }
+}
+
+function handleTouchStart(event) {
+  touchStartX = event.touches[0].clientX;
+  touchStartY = event.touches[0].clientY;
+}
+
+function handleTouchEnd(event) {
+  const touchEndX = event.changedTouches[0].clientX;
+  const touchEndY = event.changedTouches[0].clientY;
+  handleTouchMove(touchEndX, touchEndY);
+}
+
+function handleTouchMove(touchEndX, touchEndY) {
+  const dx = touchEndX - touchStartX;
+  const dy = touchEndY - touchStartY;
+
+  if (Math.abs(dx) > Math.abs(dy)) {
+    direction = dx > 0 ? 'right' : 'left';
+  } else {
+    direction = dy > 0 ? 'down' : 'up';
+  }
+}
+
 const startButton = document.getElementById('startButton');
 const stopButton = document.getElementById('stopButton');
 
@@ -101,5 +150,4 @@ stopButton.addEventListener('click', function () {
   clearInterval(gameInterval);
   location.reload();
 });
-
 
